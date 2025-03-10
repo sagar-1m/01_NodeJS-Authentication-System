@@ -1,13 +1,18 @@
-// to add other libraries or files code, import them here
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
 import dbConnect from "./utils/db.utils.js";
 import userRoutes from "./routes/user.routes.js";
 
 dotenv.config();
 
 const app = express();
+
+app.use(cookieParser());
+
+app.use(helmet());
 
 const port = process.env.PORT || 3000;
 
@@ -30,8 +35,12 @@ app.use(
 
 dbConnect();
 
-app.get("/", (req, res) => {
-  res.send("API is running....");
+// database connection health check
+app.get("/healthcheck", (_, res) => {
+  res.status(200).json({
+    status: "success",
+    message: "Server is running",
+  });
 });
 
 app.use("/api/v1/users", userRoutes);

@@ -1,6 +1,38 @@
+# Dependencies
 node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Environment variables
 .env
-.DS_Store
+
+# Runtime data
+pids
+*.pid
+*.seed
 *.log
+
+# Testing
+coverage/
+
+# Editor directories and files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build directories
 dist/
 build/
+
+# Temp directories
+.tmp/
+temp/
