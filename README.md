@@ -8,7 +8,7 @@ A comprehensive, production-ready authentication system built with Node.js, Expr
 [![Node.js](https://img.shields.io/badge/Node.js-v16+-green.svg)](https://nodejs.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-4.4+-green.svg)](https://www.mongodb.com/)
 [![Express.js](https://img.shields.io/badge/Express.js-4.17+-green.svg)](https://expressjs.com/)
-[![JWT](https://img.shields.io/badge/JWT-8.5+-green.svg)](https://jwt.io/)
+[![JWT](https://img.shields.io/badge/JWT-standard-green.svg)](https://jwt.io/)
 [![bcrypt](https://img.shields.io/badge/bcrypt-5.0+-green.svg)](https://www.npmjs.com/package/bcrypt)
 
 ## 📑 Table of Contents
@@ -28,7 +28,6 @@ A comprehensive, production-ready authentication system built with Node.js, Expr
 - [Acknowledgements](#-acknowledgements)
 - [Support](#-support)
 - [Authors](#-authors)
-- [Connect with Me](#-connect-with-me)
 
 ## ✨ Features
 
@@ -124,7 +123,7 @@ This authentication system is designed with security in mind. Here are some of t
 
 ## 📂 Project Structure
 
-### The project structure follows the MVC (Model-View-Controller) pattern. Here's a high-level overview of how the files are organized:
+The project follows the MVC (Model-View-Controller) pattern:
 
 ```
 ├── controllers/          # Route controllers
@@ -159,6 +158,7 @@ The API endpoints are designed to be RESTful and follow best practices. Here's a
 
 | Method | Endpoint                                   | Description            | Validation                   |
 | ------ | ------------------------------------------ | ---------------------- | ---------------------------- |
+| GET    | `/healthcheck `                            | Check the server is up | health                       |
 | POST   | `/api/v1/users/register`                   | Register a new user    | Name, email, strong password |
 | POST   | `/api/v1/users/login`                      | Login a user           | Email, password              |
 | POST   | `/api/v1/users/forgot-password`            | Request password reset | Email                        |
@@ -184,13 +184,13 @@ The API endpoints are designed to be RESTful and follow best practices. Here's a
 1. **Clone the repository**
 
 ```sh
-git clone https://github.com/yourusername/node-auth-system.git
+git clone https://github.com/sagar-1m/01_NodeJS-Authentication-System.git
 ```
 
 2. **Navigate to project directory**
 
 ```sh
-cd node-auth-system
+cd 01_NodeJS-Authentication-System
 ```
 
 3. **Install dependencies**
@@ -219,7 +219,8 @@ npm start
 6. **Open the API in your browser**
 
 ```sh
-# The API should now be running at http://localhost:3000
+# The API should now be running at http://localhost:5000
+
 ```
 
 ## 📝 Usage Examples
@@ -256,8 +257,7 @@ Here are some example requests to get you started with the API using Postman:
 ```json
 # Headers
 
-Authorization
-Bearer <token>
+{"Authorization": "Bearer <token>"}
 ```
 
 ### Access admin route
@@ -267,8 +267,7 @@ Bearer <token>
 ```json
 # Headers
 
-Authorization
-Bearer <token>
+{"Authorization": "Bearer <token>"}
 ```
 
 ### Logout user
@@ -278,8 +277,7 @@ Bearer <token>
 ```json
 # Headers
 
-Authorization
-Bearer <token>
+{"Authorization": "Bearer <token>"}
 ```
 
 ### Forgot password
@@ -316,10 +314,10 @@ The environment variables are stored in a `.env.example` file. Create a new file
 
 ```sh
 # Server configuration
-PORT=5000
+PORT=5000  # API server port
 NODE_ENV=development
-FRONTEND_URL=http://localhost:3000
-BASE_URL=http://localhost:5000
+FRONTEND_URL=http://localhost:3000 # Frontend URL
+BASE_URL=http://localhost:5000 # API base URL
 
 # Database configuration (Option 1: Components)
 DB_USERNAME=your_username
@@ -332,8 +330,8 @@ DB_CONNECTION_STRING=mongodb://your_username:your_password@your_host/your_databa
 
 # JWT Configuration
 JWT_SECRET=your_jwt_secret
-JWT_EXPIRE=your_time_in_minutes
-JWT_COOKIE_EXPIRE=your_time_in_days
+JWT_EXPIRE=60m     # Format: number with time unit (s, m, h, d)
+JWT_COOKIE_EXPIRE=7   # Format: integer number of days
 
 # Email Configuration (Mailtrap)
 EMAIL_HOST=
@@ -413,8 +411,6 @@ The application uses two data models: `User` and `BlacklistedToken`. Here's a br
 
 ## 🔮 Future Enhancements
 
-## 🔮 Future Enhancements
-
 - [ ] Complete email verification flow
 - [ ] Implement refresh tokens for improved session management
 - [ ] Add account lockout after failed login attempts
@@ -462,4 +458,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 Thanks for reading! 🙏
 
 [⬆️ Back to Top](#nodejs-authentication-system)
-I
