@@ -4,10 +4,7 @@
 
 import rateLimit from "express-rate-limit";
 
-// Create a rate limiter with the following options:
-// - max: maximum number of requests allowed within the windowMs time frame
-// - windowMs: time frame in milliseconds for which the max number of requests is allowed
-// - message: error message to send when the limit is exceeded
+// General API rate limiter - by IP address
 const apiLimiter = rateLimit({
   max: 100,
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -17,9 +14,11 @@ const apiLimiter = rateLimit({
     message:
       "Too many requests from this IP, please try again after 15 minutes.",
   },
+  keyGenerator: (req) =>
+    req.ip || req.headers["x-forwarded-for"] || req.socket.remoteAddress,
 });
 
-// Specific rate limiter for login requests with different options
+// Specific rate limiter for login requests by IP address
 const loginLimiter = rateLimit({
   max: 5, // 5 login attempts allowed
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -29,6 +28,8 @@ const loginLimiter = rateLimit({
     message:
       "Too many login attempts from this IP, please try again after 15 minutes.",
   },
+  keyGenerator: (req) =>
+    req.ip || req.headers["x-forwarded-for"] || req.socket.remoteAddress,
 });
 
 export { apiLimiter, loginLimiter };

@@ -61,6 +61,8 @@ app.use(
   })
 );
 
+app.set("trust proxy", 1); // trust first proxy - required for rate limiter middleware
+
 dbConnect();
 
 // database connection health check
