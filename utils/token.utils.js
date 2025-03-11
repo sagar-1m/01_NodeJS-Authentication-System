@@ -22,4 +22,13 @@ const hashToken = (token) => {
   return crypto.createHash("sha256").update(token).digest("hex");
 };
 
-export { generateSecureToken, hashToken };
+const extractTokenFromRequest = (req) => {
+  if (req.headers.authorization?.startsWith("Bearer")) {
+    return req.headers.authorization.split(" ")[1];
+  } else if (req.cookies?.token) {
+    return req.cookies.token;
+  }
+  return null;
+};
+
+export { generateSecureToken, hashToken, extractTokenFromRequest };

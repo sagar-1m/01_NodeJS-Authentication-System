@@ -3,6 +3,7 @@ import {
   forgotPassword,
   getUserProfile,
   loginUser,
+  logoutUser,
   registerUser,
   resetPassword,
 } from "../controllers/user.controller.js";
@@ -12,8 +13,10 @@ import {
   loginLimiter,
 } from "../middleware/rateLimiter.middleware.js";
 import {
+  forgotPasswordValidation,
   loginValidation,
   registerValidation,
+  resetPasswordValidation,
 } from "../middleware/validation.middleware.js";
 
 const router = Router();
@@ -38,17 +41,22 @@ router.post("/login", loginValidation, loginLimiter, loginUser);
  * @route POST /api/v1/users/forgot-password
  * @desc Forgot password - request reset token
  */
-router.post("/forgot-password", forgotPassword);
+router.post("/forgot-password", forgotPasswordValidation, forgotPassword);
 
 /**
  * @route PUT /api/v1/users/reset-password/:resetToken
  * @desc Reset password
  */
-router.put("/reset-password/:resetToken", resetPassword);
+router.put(
+  "/reset-password/:resetToken",
+  resetPasswordValidation,
+  resetPassword
+);
 
 /**
  * @route GET /api/v1/users/verify/:token
- * @desc Verify user account - email verification
+ * @desc Verify user account - email verification - currently disabled
+ *
  */
 // router.get("/verify/:token", verifyUser);
 
@@ -77,5 +85,12 @@ router.get("/admin", protect, authorize("admin"), (req, res) => {
     },
   });
 });
+
+/**
+ * @route POST /api/v1/users/logout
+ * @desc Logout user
+ * @access Private
+ */
+router.post("/logout", protect, logoutUser);
 
 export default router;

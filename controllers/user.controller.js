@@ -1,7 +1,12 @@
 import { successResponse, errorResponse } from "../utils/apiResponse.utils.js";
-import { generateSecureToken, hashToken } from "../utils/token.utils.js";
+import {
+  extractTokenFromRequest,
+  generateSecureToken,
+  hashToken,
+} from "../utils/token.utils.js";
 import User from "../models/user.model.js";
 import { sendVerificationEmail } from "../utils/mailer.utils.js";
+import BlacklistedToken from "../models/blacklistedTokens.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -17,9 +22,6 @@ const registerUser = async (req, res) => {
     if (!name || !email || !password) {
       return errorResponse(res, 400, "Please fill in all fields");
     }
-
-    console.log("Validation passed, proceed to the next step...");
-    console.log("User input data: ", { name, email, password });
 
     // Step 3: Check if the user already exists in the database
     const existingUser = await User.findOne({ email });
@@ -131,6 +133,7 @@ const registerUser = async (req, res) => {
 //     });
 //   }
 // };
+// Email verification is disabled for testing purpose
 
 // LOGIN CONTROLLER
 
@@ -173,7 +176,8 @@ const loginUser = async (req, res) => {
     // Step 7: set token in the cookie with cookie parser middleware and with cookie options
     const cookieOptions = {
       expires: new Date(
-        Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+        Date.now() +
+          parseInt(process.env.JWT_COOKIE_EXPIRE) * 24 * 60 * 60 * 1000
       ),
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -183,6 +187,7 @@ const loginUser = async (req, res) => {
     res.cookie("token", token, cookieOptions);
 
     // Step 9: Return the user data in the response
+
     return successResponse(
       res,
       200,
@@ -193,12 +198,7 @@ const loginUser = async (req, res) => {
       token
     );
   } catch (error) {
-    return errorResponse(
-      res,
-      500,
-      "Login failed. Please try again later.",
-      error.message
-    );
+    return errorResponse(res, 500, "Login failed.", error.message);
   }
 };
 
@@ -206,6 +206,7 @@ const loginUser = async (req, res) => {
 const getUserProfile = async (req, res) => {
   try {
     // Step 1: req.user is set in the protect middleware after verifying the token
+
     const user = await User.findById(req.user._id);
 
     // Step 3: Return the user data in the response
@@ -307,10 +308,52 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// LOGOUT CONTROLLER
+const logoutUser = async (req, res) => {
+  try {
+    // Step 1: Extract the token from the request header or cookies
+    const token = extractTokenFromRequest(req);
+
+    // If token is not found in the request header or cookies return an error
+    if (!token) {
+      return errorResponse(res, 401, "No active session found");
+    }
+
+    try {
+      // Verify the token to get the user id
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      // Blacklist the token
+      await BlacklistedToken.create({
+        token,
+        user: decoded.id,
+        expiresAt: new Date(decoded.exp * 1000),
+      });
+    } catch (verifyError) {
+      // Even if verification fails, we still want to clear the cookie
+      console.error("Token verification failed", verifyError);
+    }
+
+    // Clear the cookie regardless of the token verification status
+
+    res.cookie("token", "none", {
+      expires: new Date(Date.now() + 10 * 1000),
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    return successResponse(res, 200, "Logout successfully");
+  } catch (error) {
+    return errorResponse(res, 500, "Logout failed", error.message);
+  }
+};
+
 export {
   registerUser,
   loginUser,
   getUserProfile,
   forgotPassword,
   resetPassword,
+  logoutUser,
 };
