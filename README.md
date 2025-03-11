@@ -443,6 +443,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Please ⭐️ this repository if this project helped you!
 
+<div align="center">
+
 ## ✍️ Authors
 
 - [SagarMaheshwari](https://x.com/maheshwarisaga4)
@@ -453,8 +455,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 [![Hashnode](https://img.shields.io/badge/Hashnode-2962FF?style=for-the-badge&logo=hashnode&logoColor=white)](https://hashnode.com/@sagar-1m)
 [![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:maheshwarisagar65@gmail.com)
 
+</div>
+
+<div align="center">
+
 ---
 
 Thanks for reading! 🙏
 
 [⬆️ Back to Top](#nodejs-authentication-system)
+
+</div>
