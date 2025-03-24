@@ -1,34 +1,42 @@
 // Token Generation Utility
 
 import crypto from "crypto";
-
-/**
- * Generate a secure random token
- * @param {Number} bytes - Number of bytes to generate for the token (default: 32)
- * @returns {String} - Hexadecimal token string
- */
+import jwt from "jsonwebtoken";
+import { config } from "../config/env.config.js";
 
 const generateSecureToken = (bytes = 32) => {
   return crypto.randomBytes(bytes).toString("hex");
 };
 
-/**
- * Hash the token using SHA256 algorithm
- * @param {String} token - Token to hash
- * @returns {String} - Hashed token
- */
-
-const hashToken = (token) => {
-  return crypto.createHash("sha256").update(token).digest("hex");
-};
-
 const extractTokenFromRequest = (req) => {
   if (req.headers.authorization?.startsWith("Bearer")) {
     return req.headers.authorization.split(" ")[1];
+  } else if (req.cookies?.accessToken) {
+    return req.cookies.accessToken;
   } else if (req.cookies?.token) {
+    // Legacy support
     return req.cookies.token;
   }
   return null;
 };
 
-export { generateSecureToken, hashToken, extractTokenFromRequest };
+// function to generate access token (short-lived)
+const generateAccessToken = (userId) => {
+  return jwt.sign({ id: userId }, config.jwt.accessToken.secret, {
+    expiresIn: config.jwt.accessToken.expiresIn,
+  });
+};
+
+// function to generate refresh token (long-lived)
+const generateRefreshToken = (userId) => {
+  return jwt.sign({ id: userId }, config.jwt.refreshToken.secret, {
+    expiresIn: config.jwt.refreshToken.expiresIn,
+  });
+};
+
+export {
+  generateSecureToken,
+  extractTokenFromRequest,
+  generateAccessToken,
+  generateRefreshToken,
+};

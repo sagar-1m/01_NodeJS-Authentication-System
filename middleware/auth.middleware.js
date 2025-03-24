@@ -3,13 +3,13 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import BlacklistedToken from "../models/blacklistedTokens.model.js";
 import { extractTokenFromRequest } from "../utils/token.utils.js";
+import { config } from "../config/env.config.js";
 
 const protect = async (req, res, next) => {
   try {
-    // Step 1: Extract the token from the request header or cookies
-    const token = extractTokenFromRequest(req);
+    // Step 1: Extract token from cookies first, then fallback to headers
+    const token = req.cookies.accessToken || extractTokenFromRequest(req);
 
-    // If token is not found in the request header or cookies return an error
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -18,7 +18,6 @@ const protect = async (req, res, next) => {
     }
 
     // Check if the token is blacklisted
-
     const isBlacklisted = await BlacklistedToken.findOne({ token });
     if (isBlacklisted) {
       return res.status(401).json({
@@ -29,10 +28,9 @@ const protect = async (req, res, next) => {
 
     try {
       // Step 2: Verify the token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, config.jwt.accessToken.secret);
 
       // Step 3: Check if the user exists in the database
-
       const user = await User.findById(decoded.id);
 
       if (!user) {
@@ -41,8 +39,6 @@ const protect = async (req, res, next) => {
           message: "No user found with this id",
         });
       }
-
-      // Step 5: Grant access to the protected  route if all the above steps are successful
 
       req.user = user;
       next();

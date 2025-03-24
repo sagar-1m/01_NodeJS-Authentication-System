@@ -2,7 +2,7 @@
 
 // Validation middleware to check if the user input is valid before proceeding to the next step in the request processing pipeline.
 
-import { body, validationResult } from "express-validator";
+import { body, param, validationResult } from "express-validator";
 
 // validation middleware helper
 const validate = (req, res, next) => {
@@ -80,6 +80,8 @@ const forgotPasswordValidation = [
 
 // Add reset password validation rules
 const resetPasswordValidation = [
+  param("token").trim().notEmpty().withMessage("Reset token is required"),
+
   body("password")
     .trim()
     .notEmpty()
@@ -94,9 +96,31 @@ const resetPasswordValidation = [
   validate,
 ];
 
+// Verification token validation
+const verifyTokenValidation = [
+  param("token")
+    .trim()
+    .notEmpty()
+    .withMessage("Verification token is required"),
+  validate,
+];
+
+// Session ID validation
+const sessionIdValidation = [
+  param("sessionId")
+    .trim()
+    .notEmpty()
+    .withMessage("Session ID is required")
+    .isMongoId()
+    .withMessage("Invalid session ID format"),
+  validate,
+];
+
 export {
   registerValidation,
   loginValidation,
   forgotPasswordValidation,
   resetPasswordValidation,
+  verifyTokenValidation,
+  sessionIdValidation,
 };

@@ -1,6 +1,6 @@
 # Node.js Authentication System
 
-A comprehensive, production-ready authentication system built with Node.js, Express, MongoDB, and JWT providing secure user management and role-based authorization.
+A comprehensive, production-ready authentication system built with Node.js, Express, MongoDB, and JWT providing secure user management, session tracking, and role-based authorization.
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/sagar-1m/node-auth-system/graphs/commit-activity)
@@ -14,6 +14,7 @@ A comprehensive, production-ready authentication system built with Node.js, Expr
 ## 📑 Table of Contents
 
 - [Features](#-features)
+- [Implemented Functionality Checklist](#-implemented-functionality-checklist)
 - [Tech Stack](#-tech-stack)
 - [Security Implementation](#-security-implementation)
 - [Project Structure](#-project-structure)
@@ -33,10 +34,19 @@ A comprehensive, production-ready authentication system built with Node.js, Expr
 
 - **User Authentication**
 
-  - Secure registration and login system
+  - Secure registration with email verification
+  - Login with JWT tokens (access and refresh tokens)
   - Hashed passwords with bcrypt
-  - JWT token-based authentication
-  - Email verification ready (commented for testing)
+  - Centralized environment configuration with validation
+  - Token rotation for enhanced security
+
+- **Multi-Device Session Management**
+
+  - Device tracking and limiting (configurable max devices)
+  - Active sessions viewing and management
+  - Single device logout
+  - Logout from all devices except current
+  - Device and IP tracking for enhanced security
 
 - **Authorization**
 
@@ -48,7 +58,7 @@ A comprehensive, production-ready authentication system built with Node.js, Expr
 
   - Forgot password functionality
   - Secure password reset with expiring tokens
-  - Strong password validation
+  - Strong password validation with express-validator
 
 - **Security Measures**
   - Rate limiting to prevent brute force attacks
@@ -56,7 +66,36 @@ A comprehensive, production-ready authentication system built with Node.js, Expr
   - HTTP-only, secure, SameSite cookies
   - Security headers with Helmet
   - Token blacklisting system
-  - Separation of database credentials
+  - CORS protection with cors
+  - Environment variable validation at startup
+
+## ✅ Implemented Functionality Checklist
+
+- <input disabled="" type="checkbox" checked> User registration with strong validation
+- <input disabled="" type="checkbox" checked> Email verification with secure tokens
+- <input disabled="" type="checkbox" checked> User login with JWT (access and refresh tokens)
+- <input disabled="" type="checkbox" checked> Password hashing with bcrypt (10 salt rounds)
+- <input disabled="" type="checkbox" checked> HTTP-only, secure cookies for token storage
+- <input disabled="" type="checkbox" checked> Session tracking and management
+- <input disabled="" type="checkbox" checked> Multi-device support with device limiting
+- <input disabled="" type="checkbox" checked> Role-based authorization (user/admin)
+- <input disabled="" type="checkbox" checked> Protected routes with middleware
+- <input disabled="" type="checkbox" checked> Refresh token rotation for enhanced security
+- <input disabled="" type="checkbox" checked> Token blacklisting for secure logout
+- <input disabled="" type="checkbox" checked> Centralized configuration with validation
+- <input disabled="" type="checkbox" checked> Environment variable validation at startup
+- <input disabled="" type="checkbox" checked> Time string parsing for token expiration
+- <input disabled="" type="checkbox" checked> Input validation with express-validator
+- <input disabled="" type="checkbox" checked> Rate limiting for API and login endpoints
+- <input disabled="" type="checkbox" checked> Forgot password functionality
+- <input disabled="" type="checkbox" checked> Password reset with expiring tokens
+- <input disabled="" type="checkbox" checked> Multi-device logout options
+- <input disabled="" type="checkbox" checked> Individual session termination
+- <input disabled="" type="checkbox" checked> Health check endpoint
+- <input disabled="" type="checkbox" checked> Security headers with Helmet
+- <input disabled="" type="checkbox" checked> User-Agent and IP tracking
+- <input disabled="" type="checkbox" checked> MongoDB TTL indexes for auto-cleanup
+- <input disabled="" type="checkbox" checked> Structured API responses with utils
 
 ## 🛠 Tech Stack
 
@@ -65,39 +104,61 @@ A comprehensive, production-ready authentication system built with Node.js, Expr
 ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
 ![bcrypt](https://img.shields.io/badge/bcrypt-003A70?style=for-the-badge&logo=lock&logoColor=white)
+![Helmet](https://img.shields.io/badge/Helmet-0C63A6?style=for-the-badge&logo=security&logoColor=white)
+![cors](https://img.shields.io/badge/cors-FF3E00?style=for-the-badge&logo=cors&logoColor=white)
+![nodemailer](https://img.shields.io/badge/nodemailer-339933?style=for-the-badge&logo=nodemailer&logoColor=white)
+![Mailtrap](https://img.shields.io/badge/Mailtrap-FF3300?style=for-the-badge&logo=mailtrap&logoColor=white)
 
 - **Backend Framework**: Node.js + Express.js
 - **Database**: MongoDB with (Mongoose ODM)
-- **Authentication**: JWT (JSON Web Tokens)
-- **Password Hashing**: bcrypt
+- **Authentication**: JWT with access and refresh tokens
+- **Password Hashing**: bcrypt with 10 salt rounds
 - **Input Validation**: express-validator
 - **Rate Limiting**: express-rate-limit
 - **Security Headers**: Helmet
 - **Cookie Handling**: cookie-parser
 - **CORS Protection**: cors
-- **Email Services**: nodemailer with Mailtrap (commented but ready for use)
+- **Email Services**: nodemailer with Mailtrap
+- **Environment Variables**: dotenv
+- **Configuration Management**: Centralized config with validation
 
 ## 🔒 Security Implementation
 
 This authentication system is designed with security in mind. Here are some of the security measures implemented:
 
-- **Password Hashing**
+- **Advanced Token System**
 
-  - Passwords are hashed using bcrypt with 10 salt rounds.
+  - Short-lived access tokens (5 minutes) for API requests.
+  - Long-lived refresh tokens (7 days) for session management.
+  - Token rotation on refresh for enhanced security.
+  - Token blacklisting system to invalidate tokens on logout.
+  - Automatic token cleanup with MongoDB TTL index.
+
+- **Secure Cookie Management**
+
+  - HTTP-only cookies for tokens to prevent XSS attacks.
+  - Secure and SameSite flags for added security.
+  - Cookie expiration set to token expiry time.
+  - Cookie clearing on logout for added security.
+
+- **Session Security**
+
+  - Device limiting (default: 2 devices per user)
+  - Last used tracking
+  - Device and IP tracking
+  - Single device logout
+  - Force logout from all devices except current
+  - Individual session termination
+
+- **Password Security**
+
+  - Passwords are hashed using bcrypt
   - Passowrd requirements enforced via express-validator:
     - Minimum 8 characters
     - At least one uppercase letter
     - At least one lowercase letter
     - At least one number
     - At least one special character
-
-- **Token Management**
-
-  - JWT tokens are used for authentication.
-  - Tokens are stored in HTTP-only cookies with secure flags to prevent XSS attacks.
-  - Token verification on protected routes.
-  - Token blacklisting system to invalidate tokens on logout.
-  - MongoDB TTL index for automatic blacklisting cleanup.
 
 - **Request Protection**
 
@@ -108,76 +169,94 @@ This authentication system is designed with security in mind. Here are some of t
   - CORS configuration to prevent cross-origin attacks
   - Security headers with Helmet for added protection
 
-- **Database Security**
+- **Environment Security**
 
-  - Credentials separated into components for added security.
-  - Environment variables validation at startup.
-  - Connection string sharding
-  - Proper error handling for database operations
+  - Required variable validation at startup
+  - Default values for optional variables
+  - Structured configuration object
+  - Time string parsing for JWT expiry
 
 - **Email Security**
 
-  - Email verification system ready (commented for testing)
-  - Password reset system with expiring tokens
-  - Email templates with secure links and tokens for verification
+  - Email verification system with crypto tokens
+  - Forgot password system with expiring tokens
+  - Mailtrap for email testing and development
+  - Email templates for user communication using HTML
 
 ## 📂 Project Structure
 
 The project follows the MVC (Model-View-Controller) pattern:
 
 ```
-├── controllers/          # Route controllers
-│   └── user.controller.js
-├── middleware/           # Custom middleware
-│   ├── auth.middleware.js
-│   ├── rateLimiter.middleware.js
-│   └── validation.middleware.js
-├── models/               # Database models
-│   ├── blacklistedTokens.model.js
-│   └── user.model.js
-├── routes/               # API routes
-│   └── user.routes.js
-├── utils/                # Utility functions
-│   ├── apiResponse.utils.js
-│   ├── db.utils.js
-│   ├── mailer.utils.js
-│   └── token.utils.js
-├── .env                  # Environment variables (not in repo)
-├── .env.example          # Example environment variables
-├── .gitignore            # Git ignore file
-├── index.js              # Application entry point
-├── package.json          # Dependencies and scripts
-└── README.md             # Project documentation
+├── config/
+│   └── env.config.js         # Centralized configuration
+├── controllers/
+│   └── user.controller.js    # User-related operations
+├── middleware/
+│   ├── auth.middleware.js    # Authentication & authorization
+│   ├── rateLimiter.middleware.js # Request rate limiting
+│   └── validation.middleware.js  # Input validation
+├── models/
+│   ├── blacklistedTokens.model.js # Revoked tokens
+│   ├── refreshToken.model.js # Session management
+│   └── user.model.js         # User data & authentication
+├── routes/
+│   └── user.routes.js        # API endpoints
+├── utils/
+│   ├── apiResponse.utils.js  # Response formatting
+│   ├── auth.utils.js         # Authentication helpers
+│   ├── cookie.utils.js       # Cookie management
+│   ├── db.utils.js           # Database connection
+│   ├── mailer.utils.js       # Email functionality
+│   ├── session.utils.js      # Session management
+│   └── token.utils.js        # Token generation & handling
+├── .env                      # Environment variables
+├── .env.example              # Example environment variables
+├── .gitignore                # Git ignore file
+├── index.js                  # Application entry point
+├── package.json              # Dependencies and scripts
+└── README.md                 # Project documentation
 ```
 
 ## 🔌 API Endpoints
 
-The API endpoints are designed to be RESTful and follow best practices. Here's a brief overview of the routes available:
+### Health & System Endpoints
 
-### Authentication Routes (Public)
+| Method | Endpoint       | Description             | Authentication | Rate Limiting |
+| ------ | -------------- | ----------------------- | -------------- | ------------- |
+| GET    | `/healthcheck` | Check API health status | None           | None          |
 
-| Method | Endpoint                                   | Description            | Validation                   |
-| ------ | ------------------------------------------ | ---------------------- | ---------------------------- |
-| GET    | `/healthcheck `                            | Check the server is up | health                       |
-| POST   | `/api/v1/users/register`                   | Register a new user    | Name, email, strong password |
-| POST   | `/api/v1/users/login`                      | Login a user           | Email, password              |
-| POST   | `/api/v1/users/forgot-password`            | Request password reset | Email                        |
-| PUT    | `/api/v1/users/reset-password/:resetToken` | Reset password         | Strong password              |
-| GET    | `/api/v1/users/verify/:token`              | Verify email           | Token                        |
+### Authentication Endpoints (Public)
 
-### Protected Routes
+| Method | Endpoint                              | Description                  | Authentication | Rate Limiting    |
+| ------ | ------------------------------------- | ---------------------------- | -------------- | ---------------- |
+| POST   | `/api/v1/users/register`              | Register a new user          | None           | General API rate |
+| POST   | `/api/v1/users/login`                 | Login a user                 | None           | Login rate limit |
+| GET    | `/api/v1/users/verify/:token`         | Verify email address         | None           | None             |
+| POST   | `/api/v1/users/forgot-password`       | Request password reset email | None           | General API rate |
+| PUT    | `/api/v1/users/reset-password/:token` | Reset password with token    | None           | General API rate |
+| POST   | `/api/v1/users/refresh-token`         | Refresh access token         | Refresh token  | None             |
 
-| Method | Endpoint                | Description        | Access                 |
-| ------ | ----------------------- | ------------------ | ---------------------- |
-| GET    | `/api/v1/users/profile` | Get user profile   | Any authenticated user |
-| GET    | `/api/v1/users/admin`   | Access admin route | Admin role only        |
-| POST   | `/api/v1/users/logout`  | Logout user        | Any authenticated user |
+### User Profile & Management (Protected)
 
-### System Routes
+| Method | Endpoint                | Description         | Authentication | Rate Limiting    |
+| ------ | ----------------------- | ------------------- | -------------- | ---------------- |
+| GET    | `/api/v1/users/profile` | Get user profile    | Access token   | General API rate |
+| POST   | `/api/v1/users/logout`  | Logout current user | Access token   | General API rate |
 
-| Method | Endpoint       | Description             |
-| ------ | -------------- | ----------------------- |
-| GET    | `/healthcheck` | Check API health status |
+### Session Management (Protected)
+
+| Method | Endpoint                                 | Description                            | Authentication | Rate Limiting    |
+| ------ | ---------------------------------------- | -------------------------------------- | -------------- | ---------------- |
+| GET    | `/api/v1/users/sessions`                 | List all active sessions               | Access token   | General API rate |
+| POST   | `/api/v1/users/logout-all-other-devices` | Logout from all devices except current | Access token   | General API rate |
+| DELETE | `/api/v1/users/sessions/:sessionId`      | Terminate specific session             | Access token   | General API rate |
+
+### Role-Based Access (Protected)
+
+| Method | Endpoint              | Description          | Authentication            | Rate Limiting    |
+| ------ | --------------------- | -------------------- | ------------------------- | ---------------- |
+| GET    | `/api/v1/users/admin` | Access admin content | Access token + Admin role | General API rate |
 
 ## 🚀 Installation & Setup
 
@@ -209,17 +288,17 @@ cp .env.example .env
 5. **Start the server**
 
 ```sh
-# Start the server in development mode
+# Development mode with auto-restart on file changes
 npm run dev
 
-# Start the server in production mode
+# Production mode
 npm start
 ```
 
-6. **Open the API in your browser**
+6. **Access the API**
 
 ```sh
-# The API should now be running at http://localhost:5000
+# The API base URL: http://localhost:5000
 
 ```
 
@@ -227,11 +306,34 @@ npm start
 
 Here are some example requests to get you started with the API using Postman:
 
-### Register a new user
+### Health Check
 
-- **POST** `/api/v1/users/register`
+Check if the API is up and running:
+
+```http
+GET /healthcheck
+```
+
+Response:
 
 ```json
+{
+  "status": "Ok",
+  "message": "Server is running",
+  "environment": "development",
+  "uptime": 1234,
+  "timestamp": "2023-09-15T12:34:56.789Z"
+}
+```
+
+### User Registration
+
+Register a new user account:
+
+```http
+POST /api/v1/users/register
+Content-Type: application/json
+
 {
   "name": "John Doe",
   "email": "john@example.com",
@@ -239,74 +341,121 @@ Here are some example requests to get you started with the API using Postman:
 }
 ```
 
-### Login a user
+### Email Verification
 
-- **POST** `/api/v1/users/login`
+Verify user email with the token sent via email:
 
-```json
+```http
+GET /api/v1/users/verify/:token
+```
+
+### User Login
+
+Login with verified user credentials:
+
+```http
+POST /api/v1/users/login
+Content-Type: application/json
+
 {
   "email": "john@example.com",
   "password": "Password123!"
 }
 ```
 
-### Get user profile
+Note: The login request will return the access and refresh tokens in the HTTP-only cookies.
 
-- **GET** `/api/v1/users/profile`
+### Forgot Password
 
-```json
-# Headers
+Request a password reset email:
 
-{"Authorization": "Bearer <token>"}
-```
+```http
+POST /api/v1/users/forgot-password
+Content-Type: application/json
 
-### Access admin route
-
-- **GET** `/api/v1/users/admin`
-
-```json
-# Headers
-
-{"Authorization": "Bearer <token>"}
-```
-
-### Logout user
-
-- **POST** `/api/v1/users/logout`
-
-```json
-# Headers
-
-{"Authorization": "Bearer <token>"}
-```
-
-### Forgot password
-
-- **POST** `/api/v1/users/forgot-password`
-
-```json
 {
   "email": "john@example.com"
 }
 ```
 
-### Reset password
+### Reset Password
 
-- **PUT** `/api/v1/users/reset-password/:resetToken`
+Reset the user password with the token sent via email:
 
-```json
+```http
+PUT /api/v1/users/reset-password/:token
+Content-Type: application/json
+
 {
   "password": "NewPassword123!"
 }
 ```
 
-### Verify email
+### Refresh Access Token
 
-- **GET** `/api/v1/users/verify/:token`
+Get a new access token using the refresh token (automatically uses the refresh token cookie):
 
-```json
-# No request body required
+```http
+POST /api/v1/users/refresh-token
 ```
+
+Note: The refresh tokens must be sent in the HTTP-only cookie.
+
+### Get User Profile
+
+Retrieve the user profile with the access token:
+
+```http
+GET /api/v1/users/profile
+Cookie: accessToken=<your_access_token>
+```
+
+### View Active Sessions
+
+List all active sessions for the user:
+
+```http
+GET /api/v1/users/sessions
+Cookie: accessToken=<your_access_token>
+```
+
+### Terminate Specific Session
+
+End a specific session by its ID:
+
+```http
+DELETE /api/v1/users/sessions/:sessionId
+Cookie: accessToken=<your_access_token>
+```
+
+### Logout from All Other Devices
+
+Logout from all devices except the current one:
+
+```http
+POST /api/v1/users/logout-all-other-devices
+Cookie: accessToken=<your_access_token>
+```
+
+### Access Admin Route
+
+Access an admin-only route with the access token:
+
+```http
+GET /api/v1/users/admin
+Cookie: accessToken=<your_access_token>
+```
+
+### Logout Current User
+
+Logout the current user and clear the session:
+
+```http
+POST /api/v1/users/logout
+Cookie: accessToken=<your_access_token>
+```
+
+Note: The logout request will clear the access and refresh tokens from the cookies.
 
 ## ⚙️ Environment Variables
 
@@ -320,30 +469,30 @@ FRONTEND_URL=http://localhost:3000 # Frontend URL
 BASE_URL=http://localhost:5000 # API base URL
 
 # Database configuration (Option 1: Components)
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
-DB_HOST=your_host
-DB_NAME=your_database
+MONGODB_URI=mongodb+srv://your_username:your_password@your_host/your_database_name
 
-# Database configuration (Option 2: Connection String)
-DB_CONNECTION_STRING=mongodb://your_username:your_password@your_host/your_database
 
 # JWT Configuration
-JWT_SECRET=your_jwt_secret
-JWT_EXPIRE=60m     # Format: number with time unit (s, m, h, d)
-JWT_COOKIE_EXPIRE=7   # Format: integer number of days
+JWT_ACCESS_TOKEN_SECRET=your_very_long_access_token_secret_here
+ACCESS_TOKEN_EXPIRESIN=5m
+JWT_REFRESH_TOKEN_SECRET=your_very_long_refresh_token_secret_here
+REFRESH_TOKEN_EXPIRESIN=2d
 
 # Email Configuration (Mailtrap)
 EMAIL_HOST=
 EMAIL_PORT=
 EMAIL_SECURE=
 MAILTRAP_SENDEREMAIL=your_email
-MAILTRAP_SENDEREMAIL_PASS=your_password
+SMTP_USER=your_mailtrap_username
+SMTP_PASS=your_mailtrap_password
+
+# Security Configuration
+MAX_DEVICES_PER_USER=2
 ```
 
 ## 📦 Data Models
 
-The application uses two data models: `User` and `BlacklistedToken`. Here's a brief overview of the schema and models:
+The application uses three data models: `User`, `BlacklistedToken` and `RefreshToken`. Here's a brief overview of the schema and models:
 
 ### User Model
 
@@ -402,8 +551,41 @@ The application uses two data models: `User` and `BlacklistedToken`. Here's a br
   expiresAt: {
     type: Date,
     required: true,
-    index: { expires: 0 } // TTL index
+
   },
+  createdAt: Date,
+  updatedAt: Date
+}
+
+blacklistedTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 }); // TTL index for auto-cleanup
+```
+
+### RefreshToken Model
+
+```js
+{
+  token: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  user: {
+    type: ObjectId,
+    ref: "User",
+    required: true
+  },
+  expiresAt: {
+    type: Date,
+    required: true
+  },
+  deviceInfo: {
+    type: String,
+    required: true
+  },
+  ipAddress: String
+  issuedAt: Date,
+  lastUsed: Date,
+  expiresAt: Date,
   createdAt: Date,
   updatedAt: Date
 }
@@ -411,13 +593,13 @@ The application uses two data models: `User` and `BlacklistedToken`. Here's a br
 
 ## 🔮 Future Enhancements
 
-- [ ] Complete email verification flow
-- [ ] Implement refresh tokens for improved session management
-- [ ] Add account lockout after failed login attempts
-- [ ] Add social authentication (Google, GitHub, etc.)
-- [ ] Implement two-factor authentication (2FA)
-- [ ] Add user profile management endpoints
-- [ ] Create comprehensive test suite
+- <input disabled="" type="checkbox"> Add social authentication (Google, GitHub, etc.)
+- <input disabled="" type="checkbox"> Implement two-factor authentication (2FA)
+- <input disabled="" type="checkbox"> Add user profile management endpoints
+- <input disabled="" type="checkbox"> Add account lockout after failed login attempts
+- <input disabled="" type="checkbox"> Create comprehensive test suite
+- <input disabled="" type="checkbox"> Implement geo-location tracking for sessions
+- <input disabled="" type="checkbox"> Add suspicious activity detection
 
 ## 🤝 Contributing
 

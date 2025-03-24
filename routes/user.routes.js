@@ -1,11 +1,16 @@
 import { Router } from "express";
 import {
   forgotPassword,
+  getActiveSessions,
   getUserProfile,
   loginUser,
+  logoutAllOtherDevices,
   logoutUser,
+  refreshToken,
   registerUser,
   resetPassword,
+  terminateSession,
+  verifyUser,
 } from "../controllers/user.controller.js";
 import { protect, authorize } from "../middleware/auth.middleware.js";
 import {
@@ -25,57 +30,30 @@ const router = Router();
  * @Publicroutes - No authentication required
  */
 
-/**
- * @route POST /api/v1/users/register
- * @desc Register a new user
- */
 router.post("/register", registerValidation, apiLimiter, registerUser);
 
-/**
- * @route POST /api/v1/users/login
- * @desc Login a registered user
- */
 router.post("/login", loginValidation, loginLimiter, loginUser);
 
-/**
- * @route POST /api/v1/users/forgot-password
- * @desc Forgot password - request reset token
- */
 router.post("/forgot-password", forgotPasswordValidation, forgotPassword);
 
-/**
- * @route PUT /api/v1/users/reset-password/:resetToken
- * @desc Reset password
- */
-router.put(
-  "/reset-password/:resetToken",
-  resetPasswordValidation,
-  resetPassword
-);
+router.put("/reset-password/:token", resetPasswordValidation, resetPassword);
 
-/**
- * @route GET /api/v1/users/verify/:token
- * @desc Verify user account - email verification - currently disabled
- *
- */
-// router.get("/verify/:token", verifyUser);
+router.get("/verify/:token", verifyUser);
+
+router.post("/refresh-token", refreshToken);
 
 /**
  * @Protectedroutes - Authentication required
  */
 
-/**
- * @route GET /api/v1/users/profile
- * @desc Get current user profile
- * @access Private
- */
 router.get("/profile", protect, getUserProfile);
 
-/**
- * @route GET /api/v1/users/admin
- * @desc Get admin profile - Admin only
- * @access Private/admin
- */
+router.get("/sessions", protect, getActiveSessions);
+
+router.post("/logout-all-other-devices", protect, logoutAllOtherDevices);
+
+router.delete("/sessions/:sessionId", protect, terminateSession);
+
 router.get("/admin", protect, authorize("admin"), (req, res) => {
   res.status(200).json({
     success: true,
@@ -86,11 +64,6 @@ router.get("/admin", protect, authorize("admin"), (req, res) => {
   });
 });
 
-/**
- * @route POST /api/v1/users/logout
- * @desc Logout user
- * @access Private
- */
 router.post("/logout", protect, logoutUser);
 
 export default router;
