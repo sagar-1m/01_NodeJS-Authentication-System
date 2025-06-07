@@ -10,7 +10,6 @@ const getDeviceInfo = (req) => {
   return { deviceInfo, ipAddress };
 };
 
-// Find or update existing session for a device
 const updateExistingSession = async (
   userId,
   deviceInfo,
@@ -18,6 +17,7 @@ const updateExistingSession = async (
   ipAddress,
   expiryDate
 ) => {
+  // Finds and updates an existing session for the device
   try {
     // Find existing session
     const existingToken = await RefreshToken.findOne({
@@ -40,8 +40,8 @@ const updateExistingSession = async (
   }
 };
 
-// Enforce session limit for a user by deleting oldest session
 const enforceDeviceLimit = async (userId, maxDevices = null) => {
+  // Deletes oldest session if user exceeds device/session limit
   try {
     const deviceLimit = maxDevices || config.security.maxDevicesPerUser;
 
@@ -67,8 +67,8 @@ const enforceDeviceLimit = async (userId, maxDevices = null) => {
   }
 };
 
-// Format session data for response
 const formatSessionsData = (sessions, currentToken) => {
+  // Formats session data for API response
   return sessions.map((session) => ({
     id: session._id,
     deviceInfo: session.deviceInfo,

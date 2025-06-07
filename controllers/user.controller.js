@@ -174,13 +174,10 @@ const loginUser = async (req, res) => {
 
     // Step 3: Using session utils to get device info and ip address
     const { deviceInfo, ipAddress } = getDeviceInfo(req);
-
-    // token expiration time
     const refreshExpiry = new Date(
       Date.now() + config.jwt.refreshToken.expiresIn
     );
 
-    // Step 4: Using session utils to manage sessions
     const sessionUpdated = await updateExistingSession(
       user._id,
       deviceInfo,
@@ -190,10 +187,7 @@ const loginUser = async (req, res) => {
     );
 
     if (!sessionUpdated) {
-      // Enforce device limit
       await enforceDeviceLimit(user._id, 2);
-
-      // Create a new refresh token
       await RefreshToken.create({
         token: refreshToken,
         user: user._id,
@@ -525,11 +519,11 @@ export {
   registerUser,
   verifyUser,
   loginUser,
+  refreshToken,
   getUserProfile,
   forgotPassword,
   resetPassword,
   logoutUser,
-  refreshToken,
   getActiveSessions,
   logoutAllOtherDevices,
   terminateSession,
